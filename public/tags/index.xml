@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tags on Manten la karma</title>
+    <link>http://localhost:1313/tags/</link>
+    <description>Recent content in Tags on Manten la karma</description>
+    <generator>Hugo -- 0.148.1</generator>
+    <language>es</language>
+    <lastBuildDate>Sat, 01 Jun 2024 12:00:00 +0200</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PaperMod</title>
+      <link>http://localhost:1313/tags/papermod/</link>
+      <pubDate>Sat, 01 Jun 2024 12:00:00 +0200</pubDate>
+      <guid>http://localhost:1313/tags/papermod/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Prueba</title>
+      <link>http://localhost:1313/tags/prueba/</link>
+      <pubDate>Sat, 01 Jun 2024 12:00:00 +0200</pubDate>
+      <guid>http://localhost:1313/tags/prueba/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Etiqueta1</title>
+      <link>http://localhost:1313/tags/etiqueta1/</link>
+      <pubDate>Sat, 02 Jul 2022 12:00:00 +0200</pubDate>
+      <guid>http://localhost:1313/tags/etiqueta1/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Etiqueta2</title>
+      <link>http://localhost:1313/tags/etiqueta2/</link>
+      <pubDate>Sat, 02 Jul 2022 12:00:00 +0200</pubDate>
+      <guid>http://localhost:1313/tags/etiqueta2/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
