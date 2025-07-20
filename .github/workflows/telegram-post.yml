@@ -139,7 +139,7 @@ jobs:
           git add content/
           if ! git diff --staged --quiet; then
             git commit -m "Add new post from Telegram: $(date '+%Y-%m-%d %H:%M')"
-            git push
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "No new content to commit"
           fi
