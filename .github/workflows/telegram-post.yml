@@ -62,7 +62,7 @@ jobs:
           fi
 
           # Create the Hugo post
-          cat > "$FILENAME" << 'EOL'
+          cat > "$FILENAME" << EOL
           ---
           title: "$TITLE"
           date: $DATETIME
