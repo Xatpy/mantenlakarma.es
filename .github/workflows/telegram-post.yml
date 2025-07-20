@@ -1,17 +1,30 @@
-name: Create Hugo Post from Telegram
+name: Create Hugo Post from Telegram and Deploy
 
 on:
   repository_dispatch:
     types: [telegram-post]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# Default to bash
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  create-post:
+  create-post-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -119,9 +132,6 @@ jobs:
             done
           fi
 
-      - name: Build Hugo Site
-        run: hugo --minify
-
       - name: Commit New Post
         run: |
           git config --local user.email "action@github.com"
@@ -129,21 +139,31 @@ jobs:
           git add content/
           if ! git diff --staged --quiet; then
             git commit -m "Add new post from Telegram: $(date '+%Y-%m-%d %H:%M')"
+            git push
           else
             echo "No new content to commit"
           fi
 
-      - name: Build Hugo Site
-        run: hugo --minify
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
 
-      - name: Commit Built Site
+      - name: Build with Hugo
+        env:
+          # For maximum backward compatibility with Hugo modules
+          HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
         run: |
-          git add public/
-          if ! git diff --staged --quiet; then
-            git commit -m "Update built site: $(date '+%Y-%m-%d %H:%M')"
-          else
-            echo "No built changes to commit"
-          fi
+          hugo \
+            --gc \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
 
-      - name: Push All Changes
-        run: git push
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
