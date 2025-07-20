@@ -29,7 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
 
       - name: Setup Hugo
@@ -139,7 +139,7 @@ jobs:
           git add content/
           if ! git diff --staged --quiet; then
             git commit -m "Add new post from Telegram: $(date '+%Y-%m-%d %H:%M')"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+            git push
           else
             echo "No new content to commit"
           fi
