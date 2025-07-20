@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Etiqueta2 on Manten la karma</title>
+    <link>https://mantenlakarma.es/tags/etiqueta2/</link>
+    <description>Recent content in Etiqueta2 on Manten la karma</description>
+    <generator>Hugo</generator>
+    <language>es</language>
+    <lastBuildDate>Sat, 02 Jul 2022 12:00:00 +0200</lastBuildDate>
+    <atom:link href="https://mantenlakarma.es/tags/etiqueta2/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Título de tu nuevo post</title>
+      <link>https://mantenlakarma.es/posts/test1/</link>
+      <pubDate>Sat, 02 Jul 2022 12:00:00 +0200</pubDate>
+      <guid>https://mantenlakarma.es/posts/test1/</guid>
+      <description>&lt;p&gt;Escribe el contenido de tu post aquí.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
