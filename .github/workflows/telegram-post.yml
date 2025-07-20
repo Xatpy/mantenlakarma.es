@@ -63,12 +63,12 @@ jobs:
 
           # Create the Hugo post
           cat > "$FILENAME" << EOL
-          ---
-          title: "$TITLE"
-          date: $DATETIME
-          draft: false
-          tags: ["telegram", "auto-post"]
-          ---
+          +++
+          title = "$TITLE"
+          date = "$DATETIME"
+          draft = false
+          tags = ["telegram", "auto-post"]
+          +++
 
           EOL
 
