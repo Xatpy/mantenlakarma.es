@@ -119,21 +119,31 @@ jobs:
             done
           fi
 
-      - name: Commit and Push
+      - name: Build Hugo Site
+        run: hugo --minify
+
+      - name: Commit New Post
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Telegram Bot"
-          git add .
-          git commit -m "New post from Telegram: $(date '+%Y-%m-%d %H:%M')" || exit 0
-          git push
+          git add content/
+          if ! git diff --staged --quiet; then
+            git commit -m "Add new post from Telegram: $(date '+%Y-%m-%d %H:%M')"
+          else
+            echo "No new content to commit"
+          fi
 
       - name: Build Hugo Site
         run: hugo --minify
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      - name: Commit Built Site
+        run: |
+          git add public/
+          if ! git diff --staged --quiet; then
+            git commit -m "Update built site: $(date '+%Y-%m-%d %H:%M')"
+          else
+            echo "No built changes to commit"
+          fi
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
+      - name: Push All Changes
+        run: git push
