@@ -126,3 +126,13 @@ jobs:
           git add .
           git commit -m "New post from Telegram: $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
+
+      - name: Build Hugo Site
+        run: hugo --minify
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
