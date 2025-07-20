@@ -1,0 +1,140 @@
+name: Create Hugo Post from Telegram
+
+on:
+  repository_dispatch:
+    types: [telegram-post]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  create-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: "latest"
+          extended: true
+
+      - name: Create Hugo Post
+        run: |
+          # Extract data from webhook
+          TEXT="${{ github.event.client_payload.text }}"
+          MEDIA_TYPE="${{ github.event.client_payload.mediaType }}"
+          MEDIA_PATH="${{ github.event.client_payload.mediaPath }}"
+          MEDIA_CAPTION="${{ github.event.client_payload.mediaCaption }}"
+          EMBEDS='${{ toJson(github.event.client_payload.embeds) }}'
+
+          # Generate post metadata
+          DATE=$(date -u +%Y-%m-%d)
+          TIME=$(date -u +%H:%M:%S)
+          DATETIME="${DATE}T${TIME}Z"
+          SLUG=$(echo "$TEXT" | head -c 50 | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g')
+
+          # Create filename
+          if [ -z "$SLUG" ] || [ "$SLUG" = "-" ]; then
+            SLUG="telegram-post"
+          fi
+          FILENAME="content/posts/${DATE}-${SLUG}.md"
+
+          # Ensure content/posts directory exists
+          mkdir -p content/posts
+
+          # Generate post title
+          if [ -n "$TEXT" ]; then
+            TITLE=$(echo "$TEXT" | head -c 60)
+            if [ ${#TEXT} -gt 60 ]; then
+              TITLE="${TITLE}..."
+            fi
+          elif [ -n "$MEDIA_CAPTION" ]; then
+            TITLE="$MEDIA_CAPTION"
+          else
+            TITLE="Telegram Post"
+          fi
+
+          # Create the Hugo post
+          cat > "$FILENAME" << 'EOL'
+          ---
+          title: "$TITLE"
+          date: $DATETIME
+          draft: false
+          tags: ["telegram", "auto-post"]
+          ---
+
+          EOL
+
+          # Add text content
+          if [ -n "$TEXT" ]; then
+            echo "$TEXT" >> "$FILENAME"
+            echo "" >> "$FILENAME"
+          fi
+
+          # Add media content
+          if [ "$MEDIA_TYPE" = "photo" ] && [ -n "$MEDIA_PATH" ]; then
+            echo "{{< figure src=\"/$MEDIA_PATH\" alt=\"Photo from Telegram\" caption=\"$MEDIA_CAPTION\" >}}" >> "$FILENAME"
+          elif [ "$MEDIA_TYPE" = "video" ] && [ -n "$MEDIA_PATH" ]; then
+            echo "{{< video src=\"/$MEDIA_PATH\" >}}" >> "$FILENAME"
+            if [ -n "$MEDIA_CAPTION" ]; then
+              echo "*$MEDIA_CAPTION*" >> "$FILENAME"
+            fi
+          elif [ "$MEDIA_TYPE" = "document" ] && [ -n "$MEDIA_PATH" ]; then
+            echo "[Download File](/$MEDIA_PATH)" >> "$FILENAME"
+            if [ -n "$MEDIA_CAPTION" ]; then
+              echo "*$MEDIA_CAPTION*" >> "$FILENAME"
+            fi
+          fi
+
+          # Add embeds for URLs
+          if [ "$EMBEDS" != "null" ] && [ "$EMBEDS" != "[]" ]; then
+            echo "" >> "$FILENAME"
+            echo "### Links:" >> "$FILENAME"
+            echo "$EMBEDS" | jq -r '.[]' | while read -r url; do
+              if [[ "$url" == *"youtube.com"* ]] || [[ "$url" == *"youtu.be"* ]]; then
+                # Extract YouTube ID and embed
+                if [[ "$url" == *"youtu.be"* ]]; then
+                  YOUTUBE_ID=$(echo "$url" | sed 's/.*youtu.be\///;s/?.*$//')
+                else
+                  YOUTUBE_ID=$(echo "$url" | sed 's/.*v=//;s/&.*$//')
+                fi
+                echo "{{< youtube \"$YOUTUBE_ID\" >}}" >> "$FILENAME"
+              elif [[ "$url" == *"twitter.com"* ]] || [[ "$url" == *"x.com"* ]]; then
+                # Extract Twitter ID and embed
+                TWEET_ID=$(echo "$url" | sed 's/.*status\///;s/?.*$//')
+                echo "{{< tweet user=\"\" id=\"$TWEET_ID\" >}}" >> "$FILENAME"
+              else
+                echo "- [$url]($url)" >> "$FILENAME"
+              fi
+            done
+          fi
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Telegram Bot"
+          git add .
+          git commit -m "New post from Telegram: $(date '+%Y-%m-%d %H:%M')" || exit 0
+          git push
+
+      - name: Build Hugo Site
+        run: hugo --minify
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
