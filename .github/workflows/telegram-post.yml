@@ -31,6 +31,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
+          submodules: true # This is the key addition!
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
@@ -150,7 +151,9 @@ jobs:
           HUGO_ENVIRONMENT: production
           HUGO_ENV: production
         run: |
-          hugo
+          hugo \
+            --gc \
+            --minify
 
       - name: Commit Built Site
         run: |
