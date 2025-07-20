@@ -61,10 +61,13 @@ jobs:
             TITLE="Telegram Post"
           fi
 
+          # Escape quotes for TOML
+          TITLE=$(echo "$TITLE" | sed 's/"/\\"/g')
+
           # Create the Hugo post
           cat > "$FILENAME" << EOL
           +++
-          title = "$TITLE"
+          title = """$TITLE"""
           date = "$DATETIME"
           draft = false
           tags = ["telegram", "auto-post"]
