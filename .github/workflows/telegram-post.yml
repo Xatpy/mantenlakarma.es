@@ -126,18 +126,3 @@ jobs:
           git add .
           git commit -m "New post from Telegram: $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
-
-      - name: Build Hugo Site
-        run: hugo --minify
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
